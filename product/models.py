@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.text import slugify
 from utils.resizer import resize_image
 
 
@@ -7,7 +8,7 @@ class Product(models.Model):
     short_description = models.TextField(max_length=255)
     long_description = models.TextField()
     image = models.ImageField(upload_to='product_images/%Y/%m/', blank=True, null=True)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, blank=True, null=True)
     marketing_price = models.FloatField()
     promo_marketing_price = models.FloatField(default=0)
     product_type = models.CharField(
@@ -20,6 +21,10 @@ class Product(models.Model):
     )
 
     def save(self, *args, **kwargs):
+        if not self.slug:
+            slug = f'{slugify(self.name)}'
+            self.slug = slug
+
         super().save(*args, **kwargs)
 
         max_image_size = 800
