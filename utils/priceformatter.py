@@ -1,2 +1,4 @@
 def format_price(val):
-    return f'R$ {val:.2f}'.replace('.', ',')
+    if val:
+        return f'R$ {val:.2f}'.replace('.', ',')
+    return None
