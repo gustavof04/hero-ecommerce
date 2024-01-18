@@ -11,7 +11,7 @@ class Product(models.Model):
     image = models.ImageField(upload_to='product_images/%Y/%m/', blank=True, null=True)
     slug = models.SlugField(unique=True, blank=True, null=True)
     marketing_price = models.FloatField()
-    promo_marketing_price = models.FloatField(default=0)
+    promo_marketing_price = models.FloatField(default=0, blank=True, null=True)
     product_type = models.CharField(
         default='V',
         max_length=1,
@@ -49,7 +49,7 @@ class Variation(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     name = models.CharField(max_length=50, blank=True, null=True)
     price = models.FloatField()
-    promo_price = models.FloatField(default=0)
+    promo_price = models.FloatField(default=0, blank=True, null=True)
     stock = models.PositiveIntegerField(default=1)
 
     def __str__(self):
