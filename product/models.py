@@ -10,14 +10,18 @@ class Product(models.Model):
     long_description = models.TextField()
     image = models.ImageField(upload_to='product_images/%Y/%m/', blank=True, null=True)
     slug = models.SlugField(unique=True, blank=True, null=True)
-    marketing_price = models.FloatField()
-    promo_marketing_price = models.FloatField(default=0, blank=True, null=True)
+    marketing_price = models.FloatField(help_text='Obrigatório preencher na tabela abaixo mesmo se o produto não tiver variação.')
+    promo_marketing_price = models.FloatField(default=0, help_text='Mantenha 0 se não existir preço promocional. Caso exista, preencher aqui e na tabela abaixo.')
     product_type = models.CharField(
         default='V',
         max_length=1,
         choices=(
             ('V', 'Variável'),
             ('S', 'Simples'),
+        ),
+        help_text=(
+            'Variável: produto com diferentes variações (Ex.: P, M, G).<br>'
+            'Simples: produto genérico que não possui variações específicas.'
         )
     )
 
@@ -49,7 +53,7 @@ class Variation(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     name = models.CharField(max_length=50, blank=True, null=True)
     price = models.FloatField()
-    promo_price = models.FloatField(default=0, blank=True, null=True)
+    promo_price = models.FloatField(default=0)
     stock = models.PositiveIntegerField(default=1)
 
     def __str__(self):
