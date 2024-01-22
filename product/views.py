@@ -1,8 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views import View
 from django.http import HttpResponse
+from django.contrib import messages
 from . import models
 
 # TODO: Remove get() method after tests
@@ -23,7 +25,22 @@ class ProductDetail(DetailView):
 
 class AddToCart(View):
     def get(self, *args, **kwargs):
-        return HttpResponse('Adicionar ao carrinho')
+        http_referer = self.request.META.get(
+            'HTTP_REFERER',
+            reverse('product:list')
+        )
+        vid = self.request.GET.get('vid')
+
+        if not vid:
+            messages.error(
+                self.request,
+                'ERRO: O produto não existe!'
+            )
+            return redirect(http_referer)
+
+        variation = get_object_or_404(models.Variation, id=vid)
+
+        return HttpResponse(f'{variation.product}')
 
 
 class RemoveFromCart(View):
