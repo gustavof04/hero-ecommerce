@@ -39,18 +39,116 @@ class AddToCart(View):
             return redirect(http_referer)
 
         variation = get_object_or_404(models.Variation, id=vid)
+        variation_stock = variation.stock
+        product = variation.product
 
-        return HttpResponse(f'{variation.product}')
+        product_id = product.id
+        product_name = product.name
+        variation_name = variation.name or ''
+        unit_price = variation.price
+        unit_promo_price = variation.promo_price
+        quantity = 1
+        slug = product.slug
+        image = product.image
+
+        if image:
+            image = image.name
+        else:
+            image = ''
+
+        if variation.stock < 1:
+            messages.error(
+                self.request,
+                'ERRO: Estoque insuficiente!'
+            )
+            return redirect(http_referer)
+
+        if not self.request.session.get('cart'):
+            self.request.session['cart'] = {}
+            self.request.session.save()
+
+        cart = self.request.session['cart']
+
+        if vid in cart:
+            cart_quantity = cart[vid]['quantity']
+            cart_quantity += 1
+
+            if variation_stock < cart_quantity:
+                messages.warning(
+                    self.request,
+                    f'Estoque insuficiente para {cart_quantity}x no produto "{product.name}". Há {variation_stock}x no seu carrinho.'
+                )
+                cart_quantity = variation_stock
+
+            cart[vid]['quantity'] = cart_quantity
+            cart[vid]['quantitative_price'] = unit_price * cart_quantity
+            cart[vid]['quantitative_promo_price'] = unit_promo_price * cart_quantity
+        else:
+            cart[vid] = {
+                'product_id': product_id,
+                'product_name': product_name,
+                'variation_name': variation_name,
+                'variation_id': vid,
+                'unit_price': unit_price,
+                'unit_promo_price': unit_promo_price,
+                'quantitative_price': unit_price,
+                'quantitative_promo_price': unit_promo_price,
+                'quantity': 1,
+                'slug': slug,
+                'image': image,
+            }
+
+        self.request.session.save()
+
+        # TODO: Conditional for destroy the cart. Remove after tests
+        # if self.request.session.get('cart'):
+        #     del self.request.session['cart']
+        #     self.request.session.save()
+
+        messages.success(
+            self.request,
+            f'Produto {product_name} {variation_name} adicionado ao seu carrinho {cart[vid]["quantity"]}x.'
+        )
+
+        return redirect(http_referer)
 
 
 class RemoveFromCart(View):
     def get(self, *args, **kwargs):
-        return HttpResponse('Remover do Carrinho')
+        http_referer = self.request.META.get(
+            'HTTP_REFERER',
+            reverse('product:list')
+        )
+        vid = self.request.GET.get('vid')
+
+        if not vid:
+            return redirect(http_referer)
+        
+        if not self.request.session.get('cart'):
+            return redirect(http_referer)
+        
+        if vid not in self.request.session['cart']:
+            return redirect(http_referer)
+
+        cart = self.request.session['cart'][vid]
+
+        messages.success(
+            self.request,
+            f'Produto {cart["product_name"]} {cart["variation_name"]} removido do seu carrinho.'
+        )
+
+        del self.request.session['cart'][vid]
+        self.request.session.save()
+        return redirect(http_referer)
 
 
 class Cart(View):
     def get(self, *args, **kwargs):
-        return HttpResponse('Carrinho')
+        context = {
+            'cart': self.request.session.get('cart') 
+        }
+
+        return render(self.request, 'product/cart.html', context)
 
 
 class Finish(View):
