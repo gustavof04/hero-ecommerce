@@ -30,7 +30,7 @@
                                     {{ product.product_name }}
                                 </a>
 
-                                <a class="ml-3" href="#">
+                                <a class="ml-3" href="{% url "product:removefromcart" %}?vid={{ product.variation_id }}">
                                     <i class="fas fa-times-circle text-danger" aria-hidden="true"></i>
                                 </a>
                             </td>
