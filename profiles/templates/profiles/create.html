@@ -6,15 +6,17 @@
 <div class="row">
 
     {% if not request.user.is_authenticated %}
-    <div class="col-lg">
-        <h1>Login</h1>
+    <div class="col-lg mt-3">
+        <h4>Login</h4>
+        <p>Se você já está cadastrado no Hero, basta entrar com seu usuário e senha abaixo:</p>
     </div>
     {% endif %}
 
-    <div class="col-lg">
+    <div class="col-lg mt-3">
 
         {% block register_title %}
-        <h1>Cadastro</h1>
+        <h4>Cadastro</h4>
+        <p>Caso ainda não tenha cadastro, preencha o formulário a seguir para se cadastrar:</p>
         {% endblock register_title %}
 
         <form method="POST" action="">
