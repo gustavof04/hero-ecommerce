@@ -10,7 +10,8 @@
         <h4>Login</h4>
         <p>Se você já está cadastrado no Hero, basta entrar com seu usuário e senha abaixo:</p>
 
-        <form>
+        <form method="POST" action="{% url "profiles:login" %}">
+            {% csrf_token %}
             <div class="form-group">
               <label for="userInput">Usuário</label>
               <input type="text" name="username" class="form-control" id="userInput" aria-describedby="userHelp" placeholder="Digite seu usuário">
