@@ -1,7 +1,8 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic.list import ListView
 from django.views import View
 from django.http import HttpResponse
+from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 import copy
@@ -109,7 +110,23 @@ class Create(BaseProfile):
 
         self.request.session['cart'] = self.cart
         self.request.session.save()
-        return self.render
+
+        if self.request.user.is_authenticated and self.profile is not None:
+            messages.success(
+                self.request,
+                'Seu cadastro foi atualizado com sucesso.'
+            )
+        else:
+            messages.success(
+                self.request,
+                'Seu cadastro foi criado com sucesso.'
+            )
+            messages.success(
+                self.request,
+                'Você agora é um(a) hero 🦸! Aproveite os nossos produtos direto de sua residência.'
+            )
+
+        return redirect('profiles:create')
 
 
 class Update(View):
