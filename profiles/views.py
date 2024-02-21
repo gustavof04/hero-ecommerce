@@ -63,6 +63,10 @@ class BaseProfile(View):
 class Create(BaseProfile):
     def post(self, *args, **kwargs):
         if not self.userform.is_valid() or not self.profileform.is_valid():
+            messages.error(
+                self.request,
+                'Parece que há erros no seu cadastro. Verifique se você preencheu os campos corretamente.'
+            )
             return self.render
 
         username = self.userform.cleaned_data.get('username')
@@ -126,7 +130,7 @@ class Create(BaseProfile):
                 'Você agora é um(a) hero 🦸! Aproveite os nossos produtos direto de sua residência.'
             )
 
-        return redirect('profiles:create')
+        return redirect('product:list')
 
 
 class Update(View):
@@ -159,7 +163,7 @@ class Login(View):
 
         messages.success(
             self.request,
-            'Você fez login no sistema e pode concluir sua compra.'
+            'Você fez login no Hero e pode concluir sua compra.'
         )
         return redirect('product:cart')
 
