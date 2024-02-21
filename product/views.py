@@ -166,6 +166,13 @@ class PurchaseOverview(View):
             )
             return redirect('profiles:create')
 
+        if not self.request.session.get('cart'):
+            messages.error(
+                self.request,
+                'Seu carrinho está vazio.'
+            )
+            return redirect('product:list')
+
         context = {
             'user': self.request.user,
             'cart': self.request.session['cart'],
