@@ -6,6 +6,7 @@ from django.views import View
 from django.http import HttpResponse
 from django.contrib import messages
 from . import models
+from profiles.models import Profile
 
 # TODO: Remove get() method after tests
 
@@ -155,6 +156,22 @@ class PurchaseOverview(View):
     def get(self, *args, **kwargs):
         if not self.request.user.is_authenticated:
             return redirect('profiles:create')
+
+        profile = Profile.objects.filter(user=self.request.user).exists()
+
+        if not profile:
+            messages.error(
+                self.request,
+                'Usuário sem perfil. Preencha os campos vazios.'
+            )
+            return redirect('profiles:create')
+
+        if not self.request.session.get('cart'):
+            messages.error(
+                self.request,
+                'Seu carrinho está vazio.'
+            )
+            return redirect('product:list')
 
         context = {
             'user': self.request.user,
