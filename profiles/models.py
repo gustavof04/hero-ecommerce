@@ -10,7 +10,7 @@ class Profile(models.Model):
     age = models.PositiveIntegerField(verbose_name='Idade')
     cpf = models.CharField(max_length=11, help_text='Apenas números.', verbose_name='CPF')
     address = models.CharField(max_length=50, verbose_name='Endereço')
-    address_number = models.CharField(max_length=5, verbose_name='Número')
+    address_number = models.PositiveIntegerField(max_length=5, verbose_name='Número')
     address_compliment = models.CharField(max_length=30, blank=True, verbose_name='Complemento')
     neighborhood = models.CharField(max_length=30, verbose_name='Bairro')
     cep = models.CharField(max_length=8, help_text='Apenas números.', verbose_name='CEP')
