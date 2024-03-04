@@ -7,16 +7,17 @@ from utils.cpfvalidator import valid_cpf
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    age = models.PositiveIntegerField()
-    cpf = models.CharField(max_length=11, help_text='Apenas números.')
-    address = models.CharField(max_length=50)
-    address_number = models.CharField(max_length=5)
-    address_compliment = models.CharField(max_length=30)
-    neighborhood = models.CharField(max_length=30)
-    cep = models.CharField(max_length=8, help_text='Apenas números.')
-    city = models.CharField(max_length=30)
+    age = models.PositiveIntegerField(verbose_name='Idade')
+    cpf = models.CharField(max_length=11, help_text='Apenas números.', verbose_name='CPF')
+    address = models.CharField(max_length=50, verbose_name='Endereço')
+    address_number = models.PositiveIntegerField(verbose_name='Número')
+    address_compliment = models.CharField(max_length=30, blank=True, verbose_name='Complemento')
+    neighborhood = models.CharField(max_length=30, verbose_name='Bairro')
+    cep = models.CharField(max_length=8, help_text='Apenas números.', verbose_name='CEP')
+    city = models.CharField(max_length=30, verbose_name='Cidade')
     state = models.CharField(
         max_length=2,
+        verbose_name='Estado',
         default='SP',
         choices=(
             ('AC', 'Acre'),
