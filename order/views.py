@@ -12,6 +12,11 @@ from utils import cart_tools
 # TODO: Remove get() method after tests
 
 class Pay(View):
+    def get(self, *args, **kwargs):
+        return HttpResponse('PAGAR')
+
+
+class SaveOrder(View):
     template_name= 'order/pay.html'
 
     def get(self, *args, **kwargs):
@@ -92,10 +97,6 @@ class Pay(View):
         del self.request.session['cart']
         # return render(self.request, self.template_name)
         return redirect('order:list')
-
-class SaveOrder(View):
-    def get(self, *args, **kwargs):
-        return HttpResponse('Finalizar Pedido')
 
 
 class Detail(View):
