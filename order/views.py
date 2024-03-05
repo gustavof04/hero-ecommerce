@@ -1,5 +1,8 @@
+from typing import Any
+from django.db.models.query import QuerySet
 from django.shortcuts import render, redirect
-from django.views.generic.list import ListView
+from django.urls import reverse
+from django.views.generic import DetailView
 from django.views import View
 from django.http import HttpResponse
 from django.contrib import messages
@@ -11,9 +14,24 @@ from utils import cart_tools
 
 # TODO: Remove get() method after tests
 
-class Pay(View):
-    def get(self, *args, **kwargs):
-        return HttpResponse('PAGAR')
+class DispatchLoginRequired(View):
+    def dispatch(self, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            return redirect('profiles:create')
+
+        return super().dispatch(*args, **kwargs)
+
+
+class Pay(DispatchLoginRequired, DetailView):
+    template_name = 'order/pay.html'
+    model = Order
+    pk_url_kwarg = 'pk'
+    context_object_name = 'order'
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        qs = qs.filter(user=self.request.user)
+        return qs
 
 
 class SaveOrder(View):
@@ -95,8 +113,14 @@ class SaveOrder(View):
         )
 
         del self.request.session['cart']
-        # return render(self.request, self.template_name)
-        return redirect('order:list')
+        return redirect(
+            reverse(
+                'order:pay',
+                kwargs={
+                    'pk': order.pk
+                }
+            )
+        )
 
 
 class Detail(View):
