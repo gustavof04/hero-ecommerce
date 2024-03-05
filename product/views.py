@@ -5,6 +5,7 @@ from django.views.generic.detail import DetailView
 from django.views import View
 from django.http import HttpResponse
 from django.contrib import messages
+
 from . import models
 from profiles.models import Profile
 

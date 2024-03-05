@@ -1,13 +1,68 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic.list import ListView
 from django.views import View
 from django.http import HttpResponse
+from django.contrib import messages
+
+from product.models import Variation
 
 # TODO: Remove get() method after tests
 
 class Pay(View):
+    template_name= 'order/pay.html'
+
     def get(self, *args, **kwargs):
-        return HttpResponse('Pagar')
+        if not self.request.user.is_authenticated:
+            messages.error(
+                self.request,
+                'Você precisa fazer login para finalizar sua compra!'
+            )
+            return redirect('profiles:create')
+
+        if not self.request.session.get('cart'):
+            messages.error(
+                self.request,
+                'Seu carrinho está vazio!'
+            )
+            return redirect('product:list')
+
+        cart = self.request.session.get('cart')
+        cart_variation_ids = [v for v in cart]
+        bd_variations = list(
+            Variation.objects.select_related('product').filter(id__in=cart_variation_ids)
+        )
+
+        for variation in bd_variations:
+            vid = str(variation.id)
+
+            stock = variation.stock
+            cart_qnt = cart[vid]['quantity']
+            unt_price = cart[vid]['unit_price']
+            unt_promo_price = cart[vid]['unit_promo_price']
+
+            error_msg_stock = ''
+
+            if stock < cart_qnt:
+                cart[vid]['quantity'] = stock
+                cart[vid]['quantitative_price'] = stock * unt_price
+                cart[vid]['quantitative_promo_price'] = stock * unt_promo_price
+
+                error_msg_stock = 'Estoque insuficiente para alguns produtos do seu carrinho. Reduzimos a quantidade desses produtos. Por favor, verifique quais produtos foram afetados a seguir.'
+
+            if error_msg_stock:
+                messages.error(
+                    self.request,
+                    error_msg_stock
+                )
+
+                self.request.session.save()
+                return redirect('product:cart')
+
+        context = {
+
+        }
+
+        return render(self.request, self.template_name, context)
 
 
 class SaveOrder(View):
