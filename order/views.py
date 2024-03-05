@@ -5,6 +5,9 @@ from django.http import HttpResponse
 from django.contrib import messages
 
 from product.models import Variation
+from .models import Order, OrderItem
+
+from utils import cart_tools
 
 # TODO: Remove get() method after tests
 
@@ -58,12 +61,37 @@ class Pay(View):
                 self.request.session.save()
                 return redirect('product:cart')
 
-        context = {
+        qnt_cart_total = cart_tools.cart_total_qnt(cart)
+        value_cart_total = cart_tools.cart_totals(cart)
 
-        }
+        order = Order(
+            user=self.request.user,
+            total=value_cart_total,
+            qnt_total=qnt_cart_total,
+            status='C',
+        )
 
-        return render(self.request, self.template_name, context)
+        order.save()
 
+        OrderItem.objects.bulk_create(
+            [
+                OrderItem(
+                    order=order,
+                    product=v['product_name'],
+                    product_id=v['product_id'],
+                    variation=v['variation_name'],
+                    variation_id=v['variation_id'],
+                    price=v['quantitative_price'],
+                    promo_price=v['quantitative_promo_price'],
+                    quantity=v['quantity'],
+                    image=v['image'],
+                ) for v in cart.values()
+            ]
+        )
+
+        del self.request.session['cart']
+        # return render(self.request, self.template_name)
+        return redirect('order:list')
 
 class SaveOrder(View):
     def get(self, *args, **kwargs):
@@ -73,3 +101,8 @@ class SaveOrder(View):
 class Detail(View):
     def get(self, *args, **kwargs):
         return HttpResponse('Detalhe')
+
+
+class List(View):
+    def get(self, *args, **kwargs):
+        return HttpResponse('Lista')
