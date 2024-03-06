@@ -1,5 +1,4 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic.list import ListView
 from django.views import View
 from django.http import HttpResponse
 from django.contrib import messages
@@ -10,7 +9,6 @@ import copy
 from . import models
 from . import forms
 
-# TODO: Remove get() method after tests
 
 class BaseProfile(View):
     template_name = 'profiles/create.html'
@@ -166,6 +164,7 @@ class Login(View):
             'Você fez login no Hero e pode concluir sua compra.'
         )
         return redirect('product:cart')
+
 
 class Logout(View):
     def get(self, *args, **kwargs):

@@ -3,13 +3,12 @@ from django.urls import reverse
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views import View
-from django.http import HttpResponse
 from django.contrib import messages
+from django.db.models import Q
 
 from . import models
 from profiles.models import Profile
 
-# TODO: Remove get() method after tests
 
 class ListProducts(ListView):
     model = models.Product
@@ -17,6 +16,26 @@ class ListProducts(ListView):
     context_object_name = 'products'
     paginate_by = 10
     ordering = ['-id']
+
+
+class Search(ListProducts):
+    def get_queryset(self, *args, **kwargs):
+        term = self.request.GET.get('term') or self.request.session['term']
+        qs = super().get_queryset(*args, **kwargs)
+
+        if not term:
+            return qs
+
+        self.request.session['term'] = term
+
+        qs = qs.filter(
+            Q(name__icontains=term) |
+            Q(short_description__icontains=term) |
+            Q(long_description__icontains=term)
+        )
+
+        self.request.session.save()
+        return qs
 
 
 class ProductDetail(DetailView):
@@ -102,11 +121,6 @@ class AddToCart(View):
             }
 
         self.request.session.save()
-
-        # TODO: Conditional for destroy the cart. Remove after tests
-        # if self.request.session.get('cart'):
-        #     del self.request.session['cart']
-        #     self.request.session.save()
 
         messages.success(
             self.request,

@@ -22,9 +22,6 @@ INSTALLED_APPS = [
     'profiles',
     'crispy_forms',
     'crispy_bootstrap4',
-
-    # TODO: Remove debug toolbar after the entire project is done
-    'debug_toolbar',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -37,9 +34,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-    # TODO: Remove toolbar middleware after the entire project is done
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = 'hero.urls'
@@ -127,13 +121,6 @@ SESSION_SAVE_EVERY_REQUEST = False
 
 # Serializer - JSON pattern
 # SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
-
-# TODO: Remove internal ips after the entire project is done
-INTERNAL_IPS = [
-    # ...
-    '127.0.0.1',
-    # ...
-]
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
