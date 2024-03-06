@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load filters %}
+
+{% block content %}
+
+<div class="d-flex justify-content-center mt-3 mb-3">
+    <h1>Detalhes do seu pedido</h1>
+</div>
+
+{% include "partials/_order.html" %}
+
+{% endblock content %}

@@ -2,7 +2,7 @@ from typing import Any
 from django.db.models.query import QuerySet
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from django.views.generic import DetailView
+from django.views.generic import DetailView, ListView
 from django.views import View
 from django.http import HttpResponse
 from django.contrib import messages
@@ -14,24 +14,24 @@ from utils import cart_tools
 
 # TODO: Remove get() method after tests
 
-class DispatchLoginRequired(View):
+class DispatchLoginRequiredMixin(View):
     def dispatch(self, *args, **kwargs):
         if not self.request.user.is_authenticated:
             return redirect('profiles:create')
 
         return super().dispatch(*args, **kwargs)
 
-
-class Pay(DispatchLoginRequired, DetailView):
-    template_name = 'order/pay.html'
-    model = Order
-    pk_url_kwarg = 'pk'
-    context_object_name = 'order'
-
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs)
         qs = qs.filter(user=self.request.user)
         return qs
+
+
+class Pay(DispatchLoginRequiredMixin, DetailView):
+    template_name = 'order/pay.html'
+    model = Order
+    pk_url_kwarg = 'pk'
+    context_object_name = 'order'
 
 
 class SaveOrder(View):
@@ -123,11 +123,16 @@ class SaveOrder(View):
         )
 
 
-class Detail(View):
-    def get(self, *args, **kwargs):
-        return HttpResponse('Detalhe')
+class Detail(DispatchLoginRequiredMixin, DetailView):
+    model = Order
+    context_object_name = 'order'
+    template_name = 'order/detail.html'
+    pk_url_kwarg = 'pk'
 
 
-class List(View):
-    def get(self, *args, **kwargs):
-        return HttpResponse('Lista')
+class List(DispatchLoginRequiredMixin, ListView):
+    model = Order
+    context_object_name = 'orders'
+    template_name = 'order/list.html'
+    paginate_by = 10
+    ordering = ['-id']
