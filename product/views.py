@@ -3,13 +3,11 @@ from django.urls import reverse
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views import View
-from django.http import HttpResponse
 from django.contrib import messages
 
 from . import models
 from profiles.models import Profile
 
-# TODO: Remove get() method after tests
 
 class ListProducts(ListView):
     model = models.Product
@@ -102,11 +100,6 @@ class AddToCart(View):
             }
 
         self.request.session.save()
-
-        # TODO: Conditional for destroy the cart. Remove after tests
-        # if self.request.session.get('cart'):
-        #     del self.request.session['cart']
-        #     self.request.session.save()
 
         messages.success(
             self.request,

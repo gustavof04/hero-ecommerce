@@ -1,10 +1,8 @@
 from typing import Any
-from django.db.models.query import QuerySet
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import DetailView, ListView
 from django.views import View
-from django.http import HttpResponse
 from django.contrib import messages
 
 from product.models import Variation
@@ -12,7 +10,6 @@ from .models import Order, OrderItem
 
 from utils import cart_tools
 
-# TODO: Remove get() method after tests
 
 class DispatchLoginRequiredMixin(View):
     def dispatch(self, *args, **kwargs):
