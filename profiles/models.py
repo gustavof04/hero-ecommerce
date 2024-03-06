@@ -56,6 +56,16 @@ class Profile(models.Model):
     def clean(self):
         error_messages = {}
 
+        cpf_sent = self.cpf or None
+        saved_cpf = None
+        profile = Profile.objects.filter(cpf=cpf_sent).first()
+
+        if profile:
+            saved_cpf = profile.cpf
+
+            if saved_cpf is not None and self.pk != profile.pk:
+                error_messages['cpf'] = 'Já existe um cadastro com este CPF.'
+
         if not valid_cpf(self.cpf):
             error_messages['cpf'] = 'Digite um CPF válido.'
 
